@@ -3,6 +3,22 @@ using UnityEngine.Rendering;
 
 public class DoorController : MonoBehaviour
 {
+
+    public enum OvenTila
+    {
+        Auki,
+        Kiinni,
+        Lukossa
+    }
+
+    public enum OvenToiminto
+    {   
+        Sulje,
+        Lukitse,
+        Avaa,
+        AvaaLukko
+    }
+
     // Kuvat oven eri tiloille
     [SerializeField]
     Sprite ClosedDoorSprite;
@@ -19,8 +35,14 @@ public class DoorController : MonoBehaviour
     public static Color lockedColor;
     public static Color openColor;
 
+
+
     SpriteRenderer doorSprite; // Oven kuva
     SpriteRenderer lockSprite; // Lapsi gameobjectissa oleva lukon kuva
+
+
+    OvenTila oven_tila; // l
+
 
     // Debug ui
     [SerializeField]
@@ -43,6 +65,7 @@ public class DoorController : MonoBehaviour
         lockedColor = new Color(1.0f, 0.63f, 0.23f);
         openColor = new Color(0.5f, 0.8f, 1.0f);
 
+        oven_tila = OvenTila.Lukossa;
 
          // TODO
          // missä tilassa ovi on kun peli alkaa?
@@ -51,9 +74,40 @@ public class DoorController : MonoBehaviour
     /// <summary>
     /// Oveen kohdistuu jokin toiminto joka muuttaa sen tilaa
     /// </summary>
-    public void ReceiveAction()
+    public void ReceiveAction(OvenToiminto toiminto)
     {
-        
+        switch (toiminto)
+        {
+            case OvenToiminto.AvaaLukko:
+                if (oven_tila == OvenTila.Lukossa)
+                {
+                    oven_tila = OvenTila.Kiinni;
+                    UnlockDoor();
+
+                }
+                break;
+            case OvenToiminto.Avaa:
+                if (oven_tila == OvenTila.Kiinni)
+                {
+                    oven_tila = OvenTila.Auki;
+                    OpenDoor();
+                }
+                break;
+            case OvenToiminto.Sulje:
+                if (oven_tila == OvenTila.Auki)
+                {
+                    oven_tila = OvenTila.Kiinni;
+                    CloseDoor();
+                }
+                break;
+            case OvenToiminto.Lukitse:
+                if (oven_tila == OvenTila.Kiinni)
+                {
+                    oven_tila = OvenTila.Lukossa;
+                    LockDoor();
+                }
+                break;
+        }
     }
 
     // Kun tulee toiminto, sen perusteella kutsutaan jotakin
@@ -100,7 +154,7 @@ public class DoorController : MonoBehaviour
     }
 
     // *********************************
-    // Unityssä on välittömän käyttöliittymän
+    // Unityssä on väl  ittömän käyttöliittymän
     // järjestelmä, jolla voi piirtää 
     // nappeja ja tekstiä koodin avulla.
     // Se on kätevä erilaisten oikoteiden ja
